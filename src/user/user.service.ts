@@ -1,7 +1,7 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -10,10 +10,15 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as argon2 from 'argon2';
 import { plainToInstance } from 'class-transformer';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtPayloadDto } from '../common/token/dto/jwt-payload.dto';
+import { RedisService } from '../common/redis/redis.service';
+import { DeleteUserDto } from './dto/delete-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(
+    private redisService: RedisService,
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
@@ -28,13 +33,44 @@ export class UserService {
       username: createUserData.username,
       password: await argon2.hash(createUserData.password),
     });
-    const resultDb = await this.userRepository.save(newUser);
-    if (!resultDb) throw new InternalServerErrorException('User not created');
+    await this.userRepository.save(newUser);
     return plainToInstance(UserResponseDto, newUser, {
       excludeExtraneousValues: true,
     });
   }
+  async updatePassword(updateUserData: UpdateUserDto, payload: JwtPayloadDto) {
+    if (updateUserData.password === updateUserData.newPassword) {
+      throw new BadRequestException(
+        'the new password must be different from the old one',
+      );
+    }
+    const user = await this.userRepository.findOne({
+      where: {
+        id: Number(payload.id),
+      },
+    });
+    if (!user) throw new NotFoundException('User not found');
+    if (!(await argon2.verify(user.password, updateUserData.password))) {
+      throw new BadRequestException('Wrong password');
+    }
+    user.password = await argon2.hash(updateUserData.newPassword);
+    await this.redisService.deleteUserRefreshTokens(payload.id);
+    await this.userRepository.save(user);
 
-  async updatePassword() {}
-  async deleteUser() {}
+    return { success: true };
+  }
+  async deleteUser(deleteUserData: DeleteUserDto, payload: JwtPayloadDto) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: Number(payload.id),
+      },
+    });
+    if (!user) throw new NotFoundException('User not found');
+    if (!(await argon2.verify(user.password, deleteUserData.password))) {
+      throw new BadRequestException('Wrong password');
+    }
+    await this.userRepository.remove(user);
+
+    return { success: true };
+  }
 }

@@ -27,16 +27,4 @@ export class LoginResponseDto {
   })
   @Expose()
   accessToken: ResponseJwtDto;
-
-  // @ApiProperty({
-  //   example: {
-  //     token:
-  //       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwidXNlcm5hbWUiOiJBcmxpb24iLCJpYXQiOjE3MzY1MTg2MTYsImV4cCI6MTczOTExMDYxNn0.fLRDYYtlhdwBfG9PF4Jrfi9AAZtfK140778bUPn524U',
-  //     iat: 1736683277,
-  //     exp: 1739275277,
-  //   },
-  //   description: 'Refresh Token',
-  // })
-  // @Expose()
-  // refreshToken: ResponseJwtDto;
 }

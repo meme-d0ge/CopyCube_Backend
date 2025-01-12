@@ -48,12 +48,19 @@ export class AuthService {
       });
 
       const time_live: number = (refresh.exp - refresh.iat) * 1000;
-      res.cookie('refreshToken', refresh.token, {
+      res.cookie('refresh-token', refresh.token, {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
         maxAge: time_live,
-        path: '/auth',
+        path: '/auth/refresh',
+      });
+      res.cookie('refresh-token', refresh.token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: time_live,
+        path: '/auth/logout',
       });
       res.json(format_result);
     }
@@ -63,6 +70,7 @@ export class AuthService {
       String(payload.id),
       tokenJwt.token,
     );
+    return { success: true };
   }
   async refresh(jwtPayloadDto: JwtPayloadDto, res: Response) {
     const access = await this.tokenService.generateAccessToken({
@@ -73,14 +81,20 @@ export class AuthService {
       id: jwtPayloadDto.id,
       username: jwtPayloadDto.username,
     });
-
     const time_live: number = (refresh.exp - refresh.iat) * 1000;
     res.cookie('refreshToken', refresh.token, {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
       maxAge: time_live,
-      path: '/auth',
+      path: '/auth/logout',
+    });
+    res.cookie('refreshToken', refresh.token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: time_live,
+      path: '/auth/refresh',
     });
     res.json(access);
   }

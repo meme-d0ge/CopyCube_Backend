@@ -15,5 +15,5 @@ export class UpdateUserDto {
   })
   @IsNotEmpty()
   @MinLength(8, { message: 'Password must be at least 8 characters' })
-  new_password: string;
+  newPassword: string;
 }

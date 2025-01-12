@@ -38,17 +38,17 @@ export class RedisService {
     const pattern = `user:${userId}:refresh_token:*`;
     const stream = this.redisClient.scanStream({
       match: pattern,
-      count: 1,
+      count: 100,
     });
     const keysToDelete: string[] = [];
     for await (const keys of stream) {
       keysToDelete.push(...keys);
     }
-    if (keysToDelete.length > 0) {
-      await this.redisClient.del(...keysToDelete);
-    }
     this.logger.verbose(
       `Deleted all token from userId: ${userId} Count tokens: ${keysToDelete.length}`,
     );
+    if (keysToDelete.length > 0) {
+      this.redisClient.del(...keysToDelete);
+    }
   }
 }
