@@ -28,5 +28,9 @@ export default () => {
       bucket_avatars: process.env.AWS_BUCKET_AVATARS,
       bucket_posts: process.env.AWS_BUCKET_POSTS,
     },
+    redis: {
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+    },
   };
 };
