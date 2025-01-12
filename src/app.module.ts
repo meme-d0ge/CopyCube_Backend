@@ -2,7 +2,11 @@ import { Module } from '@nestjs/common';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { TokenModule } from './common/token/token.module';
 import configuration from './common/config/configuration';
+import { JwtModule } from '@nestjs/jwt';
+import { RedisModule } from './common/redis/redis.module';
 
 @Module({
   imports: [
@@ -26,6 +30,10 @@ import configuration from './common/config/configuration';
         synchronize: true,
       }),
     }),
+    AuthModule,
+    TokenModule,
+    JwtModule,
+    RedisModule,
   ],
   controllers: [],
   providers: [],

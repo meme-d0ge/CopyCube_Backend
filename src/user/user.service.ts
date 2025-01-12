@@ -23,7 +23,7 @@ export class UserService {
         username: createUserData.username,
       },
     });
-    if (user) new BadRequestException('Username already exists');
+    if (user) throw new BadRequestException('Username already exists');
     const newUser = this.userRepository.create({
       username: createUserData.username,
       password: await argon2.hash(createUserData.password),
@@ -34,6 +34,7 @@ export class UserService {
       excludeExtraneousValues: true,
     });
   }
+
   async updatePassword() {}
   async deleteUser() {}
 }

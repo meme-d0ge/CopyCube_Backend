@@ -1,14 +1,10 @@
 import { IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateUserDto {
-  @ApiProperty({ example: 'Meme_Doge', description: 'Username' })
+export class LoginDto {
+  @ApiProperty({ example: 'Meme_Doge', description: 'Username User' })
   @IsString()
   username: string;
-
-  @ApiProperty({ example: 'NO_Meme_Doge', description: 'Display name user' })
-  @IsString()
-  displayName: string;
 
   @ApiProperty({
     example: ')(*$W&R*)WE(R*EWR0239q7r8469482',
