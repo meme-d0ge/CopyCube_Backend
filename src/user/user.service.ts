@@ -14,12 +14,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtPayloadDto } from '../common/token/dto/jwt-payload.dto';
 import { RedisService } from '../common/redis/redis.service';
 import { DeleteUserDto } from './dto/delete-user.dto';
+import { Profile } from '../profile/entities/profile.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     private redisService: RedisService,
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Profile) private profileRepository: Repository<Profile>,
   ) {}
 
   async createUser(createUserData: CreateUserDto): Promise<UserResponseDto> {
@@ -29,9 +31,13 @@ export class UserService {
       },
     });
     if (user) throw new BadRequestException('Username already exists');
+    const userProfile = this.profileRepository.create({
+      displayName: createUserData.displayName,
+    });
     const newUser = this.userRepository.create({
       username: createUserData.username,
       password: await argon2.hash(createUserData.password),
+      profile: userProfile,
     });
     await this.userRepository.save(newUser);
     return plainToInstance(UserResponseDto, newUser, {

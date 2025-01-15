@@ -7,6 +7,7 @@ import { TokenModule } from './common/token/token.module';
 import configuration from './common/config/configuration';
 import { JwtModule } from '@nestjs/jwt';
 import { RedisModule } from './common/redis/redis.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { RedisModule } from './common/redis/redis.module';
     TokenModule,
     JwtModule,
     RedisModule,
+    ProfileModule,
   ],
   controllers: [],
   providers: [],
