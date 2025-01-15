@@ -23,12 +23,12 @@ export class S3Service {
     });
   }
 
-  async uploadAvatar(buffer_file: string, key: string) {
+  async uploadAvatar(buffer_file: buffer.Buffer, key: string) {
     const file: FileDto = {
       key: key,
       bucket: this.configService.get('aws.bucket_avatars'),
     };
-    return await this.uploadFile(file, buffer.Buffer.from(buffer_file));
+    return await this.uploadFile(file, buffer_file);
   }
   async downloadAvatar(key: string) {
     const file: FileDto = {
@@ -44,13 +44,16 @@ export class S3Service {
     };
     return await this.removeFile(file);
   }
+  async getLinkAvatar(key: string) {
+    return `https://storage.yandexcloud.net/${this.configService.get<string>('aws.bucket_avatars')}/${key}`;
+  }
 
-  async uploadPost(buffer_file: string, key: string) {
+  async uploadPost(buffer_file: buffer.Buffer, key: string) {
     const file: FileDto = {
       key: key,
       bucket: this.configService.get('aws.bucket_posts'),
     };
-    return await this.uploadFile(file, buffer.Buffer.from(buffer_file));
+    return await this.uploadFile(file, buffer_file);
   }
   async downloadPost(key: string) {
     const file: FileDto = {
@@ -65,6 +68,9 @@ export class S3Service {
       bucket: this.configService.get('aws.bucket_posts'),
     };
     return await this.removeFile(file);
+  }
+  async getLinkPost(key: string) {
+    return `https://storage.yandexcloud.net/${this.configService.get<string>('aws.bucket_posts')}/${key}`;
   }
 
   async uploadFile(file: FileDto, buffer_file: buffer.Buffer) {
