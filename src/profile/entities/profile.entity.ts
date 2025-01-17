@@ -38,4 +38,7 @@ export class Profile {
 
   @UpdateDateColumn()
   UpdateDate: Date;
+
+  @Column({ default: false })
+  deleted: boolean;
 }

@@ -70,13 +70,20 @@ export class UserService {
       where: {
         id: Number(payload.id),
       },
+      relations: ['profile'],
     });
     if (!user) throw new NotFoundException('User not found');
     if (!(await argon2.verify(user.password, deleteUserData.password))) {
       throw new BadRequestException('Wrong password');
     }
     await this.userRepository.remove(user);
-
+    await this.redisService.deleteUserRefreshTokens(payload.id);
+    const default_profile = this.profileRepository.create({
+      ...user.profile,
+      displayName: 'Deleted User',
+      deleted: true,
+    });
+    await this.profileRepository.save(default_profile);
     return { success: true };
   }
 }
