@@ -1,7 +1,7 @@
 import {
   BadRequestException,
   Injectable,
-  NotFoundException,
+  NotFoundException, UnauthorizedException,
 } from '@nestjs/common';
 import { JwtPayloadDto } from '../common/token/dto/jwt-payload.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -72,6 +72,7 @@ export class ProfileService {
         },
         relations: ['profile'],
       });
+      if (!user) throw new UnauthorizedException('Unauthorized');
       const profile = user.profile;
 
       if (updateProfileData.displayName) {
