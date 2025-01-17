@@ -19,6 +19,14 @@ async function bootstrap() {
     .setTitle('Notes Api of CopyCube')
     .setDescription('Description of the API of my site CopyCube')
     .setVersion('1.01')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT', // Можно указать формат токена (например, JWT)
+      },
+      'access-token', // Название схемы авторизации
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

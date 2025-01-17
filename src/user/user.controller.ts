@@ -10,7 +10,7 @@ import {
 import { UserService } from './user.service';
 import { UserResponseDto } from './dto/user-response.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AccessGuard } from '../auth/guards/access.guard';
 import { DeleteUserDto } from './dto/delete-user.dto';
@@ -34,6 +34,7 @@ export class UserController {
     return await this.userService.createUser(createUserData);
   }
 
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Update user password',
   })
@@ -50,6 +51,7 @@ export class UserController {
     return await this.userService.updatePassword(updateUserData, req.user);
   }
 
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Delete user',
   })
