@@ -2,11 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
+import { Post } from '../../post/entities/post.entity';
 
 @Entity()
 export class Profile {
@@ -15,6 +17,9 @@ export class Profile {
 
   @OneToOne(() => User, (user) => user.profile)
   user: User;
+
+  @OneToMany(() => Post, (post) => post.profile)
+  posts: Post[];
 
   @Column()
   displayName: string;
