@@ -20,6 +20,10 @@ import { plainToInstance } from 'class-transformer';
 import { ProfileResponseDto } from '../profile/dto/profile-response.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { JwtPayloadDto } from '../common/token/dto/jwt-payload.dto';
+import { ResponseListPublicPostsDto } from './dto/response-list-public-posts.dto';
+import { ResponseListWithoutProfilePostsDto } from './dto/response-list-without-profile-posts';
+import { ResponseWithoutProfilePostDto } from './dto/response-without-profile-post.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Injectable()
 export class PostService {
@@ -28,6 +32,130 @@ export class PostService {
     @InjectRepository(User) private userRepository: Repository<User>,
     private s3Service: S3Service,
   ) {}
+
+  async getListMyPosts(
+    payload: JwtPayloadDto,
+    paginationData: PaginationDto,
+  ): Promise<ResponseListWithoutProfilePostsDto> {
+    const user = await this.userRepository.findOne({
+      where: { id: Number(payload.id) },
+      relations: ['profile'],
+    });
+    if (!user) throw new NotFoundException('User not found');
+    const [posts, total] = await this.postRepository.findAndCount({
+      where: { profile: { id: user.profile.id } },
+      skip: (paginationData.page - 1) * paginationData.limit,
+      take: paginationData.limit,
+    });
+    const posts_response = await Promise.all(
+      posts.map(async (post) => {
+        const response_post: ResponseWithoutProfilePostDto = {
+          created: post.created,
+          updated: post.updated,
+          key: post.key,
+          body: await this.s3Service.getLinkPost(post.body),
+          type: post.type,
+        };
+        return plainToInstance(ResponseWithoutProfilePostDto, response_post, {
+          excludeExtraneousValues: true,
+        });
+      }),
+    );
+    return plainToInstance(
+      ResponseListWithoutProfilePostsDto,
+      {
+        total: total,
+        limit: paginationData.limit,
+        page: paginationData.page,
+        posts: posts_response,
+      },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
+  }
+
+  async getListPostsByUsername(
+    paginationData: PaginationDto,
+    username: string,
+  ) {
+    const user = await this.userRepository.findOne({
+      where: { username: username },
+      relations: ['profile'],
+    });
+    if (!user) throw new NotFoundException('User not found');
+    const [posts, total] = await this.postRepository.findAndCount({
+      where: { profile: { id: user.profile.id }, type: TypePost.PUBLIC },
+      skip: (paginationData.page - 1) * paginationData.limit,
+      take: paginationData.limit,
+    });
+    const posts_response = await Promise.all(
+      posts.map(async (post) => {
+        const response_post: ResponseWithoutProfilePostDto = {
+          created: post.created,
+          updated: post.updated,
+          key: post.key,
+          body: await this.s3Service.getLinkPost(post.body),
+          type: post.type,
+        };
+        return plainToInstance(ResponseWithoutProfilePostDto, response_post, {
+          excludeExtraneousValues: true,
+        });
+      }),
+    );
+    return plainToInstance(
+      ResponseListWithoutProfilePostsDto,
+      {
+        total: total,
+        limit: paginationData.limit,
+        page: paginationData.page,
+        posts: posts_response,
+      },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
+  }
+  async getListPublicPosts(
+    paginationData: PaginationDto,
+  ): Promise<ResponseListPublicPostsDto> {
+    const skip = (paginationData.page - 1) * paginationData.limit;
+    const [posts, total] = await this.postRepository.findAndCount({
+      skip: skip,
+      take: paginationData.limit,
+      where: { type: TypePost.PUBLIC },
+      relations: ['profile'],
+    });
+    const posts_response = await Promise.all(
+      posts.map(async (post) => {
+        const response_post: ResponsePostDto = {
+          created: post.created,
+          updated: post.updated,
+          key: post.key,
+          body: await this.s3Service.getLinkPost(post.body),
+          type: post.type,
+          profile: plainToInstance(ProfileResponseDto, post?.profile, {
+            excludeExtraneousValues: true,
+          }),
+        };
+        return plainToInstance(ResponsePostDto, response_post, {
+          excludeExtraneousValues: true,
+        });
+      }),
+    );
+    return plainToInstance(
+      ResponseListPublicPostsDto,
+      {
+        total: total,
+        limit: paginationData.limit,
+        page: paginationData.page,
+        posts: posts_response,
+      },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
+  }
 
   async create(
     req: Request,
@@ -74,7 +202,8 @@ export class PostService {
     });
     if (!post) throw new NotFoundException('Not Found');
     switch (post.type) {
-      case TypePost.PUBLIC || TypePost.LINK: {
+      case TypePost.PUBLIC:
+      case TypePost.LINK: {
         const response_post: ResponsePostDto = {
           created: post.created,
           updated: post.updated,
@@ -113,9 +242,6 @@ export class PostService {
   }
   async patch(req: Request, key: string, updatePostData: UpdatePostDto) {
     const payload = req['user'];
-    if (!payload) {
-      throw new ForbiddenException("Anonymous user can't update post");
-    }
     const post = await this.postRepository.findOne({
       where: {
         key: key,
@@ -171,9 +297,6 @@ export class PostService {
   }
   async delete(req: Request, key: string) {
     const payload = req['user'];
-    if (!payload) {
-      throw new ForbiddenException("Anonymous user can't delete post");
-    }
     const post = await this.postRepository.findOne({
       where: { key: key },
       relations: ['profile', 'profile.user'],

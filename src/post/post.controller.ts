@@ -5,7 +5,8 @@ import {
   Get,
   Param,
   Patch,
-  Post,
+  Post, 
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -15,10 +16,37 @@ import { OptionalGuard } from '../auth/guards/optional.guard';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponsePostDto } from './dto/response-post.dto';
+import { AccessGuard } from '../auth/guards/access.guard';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Controller('post')
 export class PostController {
   constructor(private postService: PostService) {}
+  @Get('user/:username')
+  async getListPostsByUsername(
+    @Param('username') username: string,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    return await this.postService.getListPostsByUsername(
+      paginationDto,
+      username,
+    );
+  }
+
+  @UseGuards(AccessGuard)
+  @Get('user')
+  async getListMyPosts(
+    @Req() req: Request,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    return await this.postService.getListMyPosts(req['user'], paginationDto);
+  }
+
+  @Get('public')
+  async getListPublicPosts(@Query() paginationDto: PaginationDto) {
+    return await this.postService.getListPublicPosts(paginationDto);
+  }
+
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Create post',
@@ -64,7 +92,7 @@ export class PostController {
     description: 'Post updated successfully',
     type: ResponsePostDto,
   })
-  @UseGuards(OptionalGuard)
+  @UseGuards(AccessGuard)
   @Patch(':key')
   async update(
     @Param('key') key: string,
@@ -85,7 +113,7 @@ export class PostController {
       example: { success: true },
     },
   })
-  @UseGuards(OptionalGuard)
+  @UseGuards(AccessGuard)
   @Delete(':key')
   async delete(@Param('key') key: string, @Req() req: Request) {
     return await this.postService.delete(req, key);
