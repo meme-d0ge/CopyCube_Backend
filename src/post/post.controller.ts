@@ -14,14 +14,36 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { PostService } from './post.service';
 import { OptionalGuard } from '../auth/guards/optional.guard';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { ResponsePostDto } from './dto/response-post.dto';
 import { AccessGuard } from '../auth/guards/access.guard';
 import { PaginationDto } from './dto/pagination.dto';
+import { ResponseListWithoutProfilePostsDto } from './dto/response-list-without-profile-posts';
+import { ResponseListPublicPostsDto } from './dto/response-list-public-posts.dto';
 
 @Controller('post')
 export class PostController {
   constructor(private postService: PostService) {}
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    required: false,
+    description: 'Page number',
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    required: false,
+    description: 'Number of items per page',
+  })
+  @ApiOperation({
+    summary: 'Retrieve all public posts by username',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Getting all public posts by username successfully',
+    type: ResponseListWithoutProfilePostsDto,
+  })
   @Get('user/:username')
   async getListPostsByUsername(
     @Param('username') username: string,
@@ -33,6 +55,27 @@ export class PostController {
     );
   }
 
+  @ApiBearerAuth('access-token')
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    required: false,
+    description: 'Page number',
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    required: false,
+    description: 'Number of items per page',
+  })
+  @ApiOperation({
+    summary: 'Retrieving all your posts by username',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Getting all your posts by username successfully',
+    type: ResponseListWithoutProfilePostsDto,
+  })
   @UseGuards(AccessGuard)
   @Get('user')
   async getListMyPosts(
@@ -42,6 +85,26 @@ export class PostController {
     return await this.postService.getListMyPosts(req['user'], paginationDto);
   }
 
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    required: false,
+    description: 'Page number',
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    required: false,
+    description: 'Number of items per page',
+  })
+  @ApiOperation({
+    summary: 'Getting the list of public posts',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Getting the list of public posts successfully',
+    type: ResponseListPublicPostsDto,
+  })
   @Get('public')
   async getListPublicPosts(@Query() paginationDto: PaginationDto) {
     return await this.postService.getListPublicPosts(paginationDto);
@@ -66,14 +129,6 @@ export class PostController {
   }
 
   @ApiBearerAuth('access-token')
-  @ApiOperation({
-    summary: 'Get post',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Post got successfully',
-    type: ResponsePostDto,
-  })
   @UseGuards(OptionalGuard)
   @Get(':key')
   async get(
