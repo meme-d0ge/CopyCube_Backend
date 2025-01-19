@@ -6,14 +6,13 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       transform: true,
     }),
   );
-
   const config = new DocumentBuilder()
     .setTitle('Notes Api of CopyCube')
     .setDescription('Description of the API of my site CopyCube')

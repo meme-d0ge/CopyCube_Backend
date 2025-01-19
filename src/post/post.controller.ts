@@ -3,9 +3,10 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
-  Post, 
+  Post,
   Query,
   Req,
   UseGuards,
@@ -14,7 +15,12 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { PostService } from './post.service';
 import { OptionalGuard } from '../auth/guards/optional.guard';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { ResponsePostDto } from './dto/response-post.dto';
 import { AccessGuard } from '../auth/guards/access.guard';
 import { PaginationDto } from './dto/pagination.dto';
@@ -23,6 +29,7 @@ import { ResponseListPublicPostsDto } from './dto/response-list-public-posts.dto
 
 @Controller('post')
 export class PostController {
+  private logger = new Logger(PostController.name);
   constructor(private postService: PostService) {}
   @ApiQuery({
     name: 'page',
@@ -49,6 +56,7 @@ export class PostController {
     @Param('username') username: string,
     @Query() paginationDto: PaginationDto,
   ) {
+    this.logger.log('GET Request /api/post/user/:username');
     return await this.postService.getListPostsByUsername(
       paginationDto,
       username,
@@ -82,6 +90,7 @@ export class PostController {
     @Req() req: Request,
     @Query() paginationDto: PaginationDto,
   ) {
+    this.logger.log('GET Request /api/post/user');
     return await this.postService.getListMyPosts(req['user'], paginationDto);
   }
 
@@ -107,6 +116,7 @@ export class PostController {
   })
   @Get('public')
   async getListPublicPosts(@Query() paginationDto: PaginationDto) {
+    this.logger.log('GET Request /api/post/public');
     return await this.postService.getListPublicPosts(paginationDto);
   }
 
@@ -125,6 +135,7 @@ export class PostController {
     @Body() createPostDto: CreatePostDto,
     @Req() req: Request,
   ): Promise<ResponsePostDto> {
+    this.logger.log('POST Request /api/post');
     return await this.postService.create(req, createPostDto);
   }
 
@@ -135,6 +146,7 @@ export class PostController {
     @Param('key') key: string,
     @Req() req: Request,
   ): Promise<ResponsePostDto> {
+    this.logger.log('GET Request /api/post/:key');
     return await this.postService.get(req, key);
   }
 
@@ -154,6 +166,7 @@ export class PostController {
     @Body() updatePostData: UpdatePostDto,
     @Req() req: Request,
   ): Promise<ResponsePostDto> {
+    this.logger.log('PATCH Request /api/post/:key');
     return await this.postService.patch(req, key, updatePostData);
   }
 
@@ -171,6 +184,7 @@ export class PostController {
   @UseGuards(AccessGuard)
   @Delete(':key')
   async delete(@Param('key') key: string, @Req() req: Request) {
+    this.logger.log('DELETE Request /api/post/:key');
     return await this.postService.delete(req, key);
   }
 }

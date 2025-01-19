@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Logger,
   Patch,
   Post,
   Req,
@@ -17,6 +18,7 @@ import { DeleteUserDto } from './dto/delete-user.dto';
 
 @Controller('user')
 export class UserController {
+  private logger = new Logger(UserController.name);
   constructor(private readonly userService: UserService) {}
 
   @ApiOperation({
@@ -31,6 +33,7 @@ export class UserController {
   async createUser(
     @Body() createUserData: CreateUserDto,
   ): Promise<UserResponseDto> {
+    this.logger.log('POST Request /api/user');
     return await this.userService.createUser(createUserData);
   }
 
@@ -48,6 +51,7 @@ export class UserController {
   @UseGuards(AccessGuard)
   @Patch()
   async updatePassword(@Req() req, @Body() updateUserData: UpdateUserDto) {
+    this.logger.log('PATCH Request /api/user');
     return await this.userService.updatePassword(updateUserData, req.user);
   }
 
@@ -65,6 +69,7 @@ export class UserController {
   @UseGuards(AccessGuard)
   @Delete()
   async deleteUser(@Req() req, @Body() deleteUserData: DeleteUserDto) {
+    this.logger.log('DELETE Request /api/user');
     return await this.userService.deleteUser(deleteUserData, req.user);
   }
 }

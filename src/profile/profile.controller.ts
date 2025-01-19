@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Logger,
   Param,
   Patch,
   Req,
@@ -25,6 +26,7 @@ import { ProfileResponseDto } from './dto/profile-response.dto';
 
 @Controller('profile')
 export class ProfileController {
+  private logger = new Logger(ProfileController.name);
   constructor(private profileService: ProfileService) {}
 
   @ApiBearerAuth('access-token')
@@ -39,6 +41,7 @@ export class ProfileController {
   @UseGuards(AccessGuard)
   @Get()
   async getProfile(@Req() req): Promise<OwnerProfileResponseDto> {
+    this.logger.log('GET Request /api/profile');
     return await this.profileService.getProfile(req.user);
   }
 
@@ -54,6 +57,7 @@ export class ProfileController {
   async getProfileByUsername(
     @Param('username') username: string,
   ): Promise<ProfileResponseDto> {
+    this.logger.log('GET Request /api/profile/:username');
     return await this.profileService.getProfileByUsername(username);
   }
 
@@ -100,6 +104,7 @@ export class ProfileController {
     @Req() req,
     @UploadedFile() avatar?: Express.Multer.File,
   ) {
+    this.logger.log('PATCH Request /api/profile');
     return await this.profileService.patchProfile(
       updateProfileData,
       req.user,

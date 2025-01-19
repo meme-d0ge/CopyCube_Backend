@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Post,
   Req,
   Res,
@@ -18,6 +19,7 @@ import { ResponseJwtDto } from '../common/token/dto/response-jwt.dto';
 
 @Controller('auth')
 export class AuthController {
+  private logger = new Logger(AuthController.name);
   constructor(private readonly authService: AuthService) {}
 
   @ApiOperation({
@@ -36,6 +38,7 @@ export class AuthController {
   @UseGuards(RefreshGuard)
   @Get('refresh')
   async refresh(@Req() req, @Res() res: Express.Response) {
+    this.logger.log('GET Request /api/auth/refresh');
     await this.authService.refresh(req['payload'], res);
   }
 
@@ -49,6 +52,7 @@ export class AuthController {
   })
   @Post('login')
   async login(@Body() loginData: LoginDto, @Res() res: Express.Response) {
+    this.logger.log('POST Request /api/auth/login');
     return await this.authService.login(loginData, res);
   }
   @ApiOperation({
@@ -69,6 +73,7 @@ export class AuthController {
   @UseGuards(RefreshGuard)
   @Delete('logout')
   async logout(@Req() req: Request) {
+    this.logger.log('DELETE Request /api/auth/logout');
     await this.authService.logout(req['token'], req['payload']);
   }
 }
