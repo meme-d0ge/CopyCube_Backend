@@ -1,7 +1,8 @@
 import {
   BadRequestException,
   Injectable,
-  NotFoundException, UnauthorizedException,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtPayloadDto } from '../common/token/dto/jwt-payload.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -58,8 +59,8 @@ export class ProfileService {
 
   async patchProfile(
     updateProfileData: UpdateProfileDto,
-    image: Express.Multer.File,
     payloadJwt: JwtPayloadDto,
+    image?: Express.Multer.File,
   ) {
     if (
       updateProfileData.displayName ||
@@ -102,6 +103,7 @@ export class ProfileService {
             const result = await this.s3Service.uploadAvatar(
               image.buffer,
               key_file,
+              resultCheck.format,
             );
             if (result) {
               profile.avatar = await this.s3Service.getLinkAvatar(key_file);
@@ -118,14 +120,22 @@ export class ProfileService {
       await this.profileRepository.save(profile);
       return { success: true };
     }
+    return { success: true };
   }
   async checkImage(image: Buffer<ArrayBuffer>) {
     const meta = await sharp(image).metadata();
-    if (meta && !(meta.format === 'png' || meta.format === 'jpeg')) {
+    if (
+      meta &&
+      !(
+        meta.format === 'png' ||
+        meta.format === 'jpeg' ||
+        meta.format === 'jpg'
+      )
+    ) {
       return false;
     }
     const size = meta.size;
     if (size > 100 * 1024) return false;
-    return true;
+    return meta;
   }
 }

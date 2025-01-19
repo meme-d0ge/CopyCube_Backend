@@ -13,7 +13,13 @@ import { ProfileService } from './profile.service';
 import { AccessGuard } from '../auth/guards/access.guard';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { OwnerProfileResponseDto } from './dto/owner-profile-response.dto';
 import { ProfileResponseDto } from './dto/profile-response.dto';
 
@@ -62,18 +68,42 @@ export class ProfileController {
       example: { success: true },
     },
   })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Upload an image file',
+    schema: {
+      type: 'object',
+      properties: {
+        avatar: {
+          type: 'string',
+          format: 'binary',
+        },
+        displayName: {
+          type: 'string',
+          format: 'string',
+          example: 'Meme_Doge_display_name',
+        },
+        description: {
+          type: 'string',
+          format: 'string',
+          example: 'User Description',
+        },
+      },
+      required: [],
+    },
+  })
   @UseGuards(AccessGuard)
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('avatar'))
   @Patch()
   async patchProfile(
-    @UploadedFile() file: Express.Multer.File,
     @Body() updateProfileData: UpdateProfileDto,
     @Req() req,
+    @UploadedFile() avatar?: Express.Multer.File,
   ) {
     return await this.profileService.patchProfile(
       updateProfileData,
-      file,
       req.user,
+      avatar,
     );
   }
 }
