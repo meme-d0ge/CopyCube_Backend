@@ -39,7 +39,7 @@ export class PostService {
   ): Promise<ResponseListWithoutProfilePostsDto> {
     const user = await this.userRepository.findOne({
       where: { id: Number(payload.id) },
-      relations: ['profile'],
+      relations: ['profile', 'profile.user'],
     });
     if (!user) throw new NotFoundException('User not found');
     const [posts, total] = await this.postRepository.findAndCount({
@@ -81,7 +81,7 @@ export class PostService {
   ) {
     const user = await this.userRepository.findOne({
       where: { username: username },
-      relations: ['profile'],
+      relations: ['profile', 'profile.user'],
     });
     if (!user) throw new NotFoundException('User not found');
     const [posts, total] = await this.postRepository.findAndCount({
@@ -124,7 +124,7 @@ export class PostService {
       skip: skip,
       take: paginationData.limit,
       where: { type: TypePost.PUBLIC },
-      relations: ['profile'],
+      relations: ['profile', 'profile.user'],
     });
     const posts_response = await Promise.all(
       posts.map(async (post) => {
@@ -134,9 +134,16 @@ export class PostService {
           key: post.key,
           body: await this.s3Service.getLinkPost(post.body),
           type: post.type,
-          profile: plainToInstance(ProfileResponseDto, post?.profile, {
-            excludeExtraneousValues: true,
-          }),
+          profile: plainToInstance(
+            ProfileResponseDto,
+            {
+              ...post?.profile,
+              username: post?.profile?.user.username,
+            },
+            {
+              excludeExtraneousValues: true,
+            },
+          ),
         };
         return plainToInstance(ResponsePostDto, response_post, {
           excludeExtraneousValues: true,
@@ -166,7 +173,7 @@ export class PostService {
     if (payload) {
       const user = await this.userRepository.findOne({
         where: { id: Number(payload.id) },
-        relations: ['profile'],
+        relations: ['profile', 'profile.user'],
       });
       if (!user) throw new UnauthorizedException('Unauthorized');
       post = await this.createPost(createPostDto, user.profile);
@@ -185,9 +192,16 @@ export class PostService {
       key: post.key,
       body: await this.s3Service.getLinkPost(post.body),
       type: post.type,
-      profile: plainToInstance(ProfileResponseDto, post.profile, {
-        excludeExtraneousValues: true,
-      }),
+      profile: plainToInstance(
+        ProfileResponseDto,
+        {
+          ...post?.profile,
+          username: post?.profile.user.username,
+        },
+        {
+          excludeExtraneousValues: true,
+        },
+      ),
     };
     return plainToInstance(ResponsePostDto, response_post, {
       excludeExtraneousValues: true,
@@ -210,9 +224,16 @@ export class PostService {
           key: post.key,
           body: await this.s3Service.getLinkPost(post.body),
           type: post.type,
-          profile: plainToInstance(ProfileResponseDto, post.profile, {
-            excludeExtraneousValues: true,
-          }),
+          profile: plainToInstance(
+            ProfileResponseDto,
+            {
+              ...post?.profile,
+              username: post?.profile.user.username,
+            },
+            {
+              excludeExtraneousValues: true,
+            },
+          ),
         };
         return plainToInstance(ResponsePostDto, response_post, {
           excludeExtraneousValues: true,
@@ -230,9 +251,16 @@ export class PostService {
           key: post.key,
           body: await this.s3Service.getLinkPost(post.body),
           type: post.type,
-          profile: plainToInstance(ProfileResponseDto, post.profile, {
-            excludeExtraneousValues: true,
-          }),
+          profile: plainToInstance(
+            ProfileResponseDto,
+            {
+              ...post?.profile,
+              username: post?.profile.user.username,
+            },
+            {
+              excludeExtraneousValues: true,
+            },
+          ),
         };
         return plainToInstance(ResponsePostDto, response_post, {
           excludeExtraneousValues: true,
@@ -275,9 +303,16 @@ export class PostService {
         {
           ...new_post,
           body: await this.s3Service.getLinkPost(new_post.body),
-          profile: plainToInstance(ProfileResponseDto, new_post.profile, {
-            excludeExtraneousValues: true,
-          }),
+          profile: plainToInstance(
+            ProfileResponseDto,
+            {
+              ...new_post?.profile,
+              username: new_post?.profile.user.username,
+            },
+            {
+              excludeExtraneousValues: true,
+            },
+          ),
         },
         { excludeExtraneousValues: true },
       );
@@ -288,9 +323,16 @@ export class PostService {
       {
         ...post,
         body: await this.s3Service.getLinkPost(post.body),
-        profile: plainToInstance(ProfileResponseDto, post.profile, {
-          excludeExtraneousValues: true,
-        }),
+        profile: plainToInstance(
+          ProfileResponseDto,
+          {
+            ...post?.profile,
+            username: post?.profile.user.username,
+          },
+          {
+            excludeExtraneousValues: true,
+          },
+        ),
       },
       { excludeExtraneousValues: true },
     );

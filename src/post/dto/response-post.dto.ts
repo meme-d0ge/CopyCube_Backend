@@ -28,10 +28,13 @@ export class ResponsePostDto {
 
   @ApiProperty({
     example: {
-      displayName: 'Deleted User',
+      username: 'Meme_Doge',
+      displayName: 'NO_Meme_Doge',
       avatar:
         'https://storage.yandexcloud.net/copycube-avatars/2d57edf1-b205-4d76-8470-8a2e2e20c5a0',
+      description: "hello i'm full stack",
       CreateDate: '2025-01-17T14:09:32.309Z',
+      deleted: false,
     },
     description: 'user profile of the user who created the post',
   })

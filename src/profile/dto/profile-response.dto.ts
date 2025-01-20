@@ -3,6 +3,13 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class ProfileResponseDto {
   @ApiProperty({
+    example: 'Meme_Doge',
+    description: 'username',
+  })
+  @Expose()
+  username: string;
+
+  @ApiProperty({
     example: 'Meme_Doge_display_name',
     description: 'DisplayName',
   })

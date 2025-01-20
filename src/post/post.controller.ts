@@ -140,6 +140,14 @@ export class PostController {
   }
 
   @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: 'Get post',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Post got successfully',
+    type: ResponsePostDto,
+  })
   @UseGuards(OptionalGuard)
   @Get(':key')
   async get(

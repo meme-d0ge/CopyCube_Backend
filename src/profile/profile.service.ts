@@ -38,9 +38,13 @@ export class ProfileService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return plainToInstance(OwnerProfileResponseDto, user.profile, {
-      excludeExtraneousValues: true,
-    });
+    return plainToInstance(
+      OwnerProfileResponseDto,
+      { ...user.profile, username: user.username },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
   }
   async getProfileByUsername(username: string) {
     const user = await this.userRepository.findOne({
@@ -52,9 +56,13 @@ export class ProfileService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return plainToInstance(ProfileResponseDto, user.profile, {
-      excludeExtraneousValues: true,
-    });
+    return plainToInstance(
+      ProfileResponseDto,
+      { ...user.profile, username: username },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
   }
 
   async patchProfile(
