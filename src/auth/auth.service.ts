@@ -53,14 +53,14 @@ export class AuthService {
         secure: true,
         sameSite: 'strict',
         maxAge: time_live,
-        path: '/auth/refresh',
+        path: '/api/auth/refresh',
       });
       res.cookie('refresh-token', refresh.token, {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
         maxAge: time_live,
-        path: '/auth/logout',
+        path: '/api/auth/logout',
       });
       res.json(format_result);
     }
@@ -87,14 +87,14 @@ export class AuthService {
       secure: true,
       sameSite: 'strict',
       maxAge: time_live,
-      path: '/auth/logout',
+      path: '/api/auth/logout',
     });
     res.cookie('refreshToken', refresh.token, {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
       maxAge: time_live,
-      path: '/auth/refresh',
+      path: '/api/auth/refresh',
     });
     res.json(access);
   }
