@@ -6,6 +6,7 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
@@ -21,9 +22,9 @@ async function bootstrap() {
       {
         type: 'http',
         scheme: 'bearer',
-        bearerFormat: 'JWT', // Можно указать формат токена (например, JWT)
+        bearerFormat: 'JWT',
       },
-      'access-token', // Название схемы авторизации
+      'access-token',
     )
     .build();
   const document = SwaggerModule.createDocument(app, config);
