@@ -82,14 +82,14 @@ export class AuthService {
       username: jwtPayloadDto.username,
     });
     const time_live: number = (refresh.exp - refresh.iat) * 1000;
-    res.cookie('refreshToken', refresh.token, {
+    res.cookie('refresh-token', refresh.token, {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
       maxAge: time_live,
       path: '/api/auth/logout',
     });
-    res.cookie('refreshToken', refresh.token, {
+    res.cookie('refresh-token', refresh.token, {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
