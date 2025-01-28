@@ -74,6 +74,6 @@ export class AuthController {
   @Delete('logout')
   async logout(@Req() req: Request) {
     this.logger.log('DELETE Request /api/auth/logout');
-    await this.authService.logout(req['token'], req['payload']);
+    return await this.authService.logout(req['token'], req['payload']);
   }
 }
