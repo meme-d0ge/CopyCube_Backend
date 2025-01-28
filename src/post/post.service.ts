@@ -281,13 +281,14 @@ export class PostService {
       throw new ForbiddenException("It's not your post");
     }
     let changes = 0;
-    if (updatePostData.type !== post.type) {
+    if (updatePostData?.type && updatePostData.type !== post.type) {
       post.type = updatePostData.type;
       changes++;
     }
     if (
+      updatePostData?.body &&
       crypto.createHash('sha256').update(updatePostData.body).digest('hex') !==
-      post.hash
+        post.hash
     ) {
       const s3_key = crypto.randomBytes(32).toString('base64url');
       await this.s3Service.uploadPost(Buffer.from(updatePostData.body), s3_key);
