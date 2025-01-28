@@ -228,7 +228,7 @@ export class PostService {
             ProfileResponseDto,
             {
               ...post?.profile,
-              username: post?.profile.user.username,
+              username: post?.profile?.user.username,
             },
             {
               excludeExtraneousValues: true,
@@ -255,7 +255,7 @@ export class PostService {
             ProfileResponseDto,
             {
               ...post?.profile,
-              username: post?.profile.user.username,
+              username: post?.profile?.user.username,
             },
             {
               excludeExtraneousValues: true,
@@ -307,7 +307,7 @@ export class PostService {
             ProfileResponseDto,
             {
               ...new_post?.profile,
-              username: new_post?.profile.user.username,
+              username: new_post?.profile?.user.username,
             },
             {
               excludeExtraneousValues: true,
@@ -327,7 +327,7 @@ export class PostService {
           ProfileResponseDto,
           {
             ...post?.profile,
-            username: post?.profile.user.username,
+            username: post?.profile?.user.username,
           },
           {
             excludeExtraneousValues: true,
