@@ -74,7 +74,6 @@ export class PostService {
       },
     );
   }
-
   async getListPostsByUsername(
     paginationData: PaginationDto,
     username: string,
@@ -138,7 +137,7 @@ export class PostService {
             ProfileResponseDto,
             {
               ...post?.profile,
-              username: post?.profile?.user.username,
+              username: post?.profile?.user?.username,
             },
             {
               excludeExtraneousValues: true,
