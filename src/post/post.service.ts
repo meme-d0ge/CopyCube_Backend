@@ -44,6 +44,9 @@ export class PostService {
     if (!user) throw new NotFoundException('User not found');
     const [posts, total] = await this.postRepository.findAndCount({
       where: { profile: { id: user.profile.id } },
+      order: {
+        updated: 'DESC',
+      },
       skip: (paginationData.page - 1) * paginationData.limit,
       take: paginationData.limit,
     });
@@ -85,6 +88,9 @@ export class PostService {
     if (!user) throw new NotFoundException('User not found');
     const [posts, total] = await this.postRepository.findAndCount({
       where: { profile: { id: user.profile.id }, type: TypePost.PUBLIC },
+      order: {
+        created: 'DESC',
+      },
       skip: (paginationData.page - 1) * paginationData.limit,
       take: paginationData.limit,
     });
@@ -123,6 +129,9 @@ export class PostService {
       skip: skip,
       take: paginationData.limit,
       where: { type: TypePost.PUBLIC },
+      order: {
+        created: 'DESC',
+      },
       relations: ['profile', 'profile.user'],
     });
     const posts_response = await Promise.all(
