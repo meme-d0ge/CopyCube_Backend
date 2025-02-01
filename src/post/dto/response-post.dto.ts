@@ -12,6 +12,13 @@ export class ResponsePostDto {
   key: string;
 
   @ApiProperty({
+    example: 'Title',
+    description: 'title post',
+  })
+  @Expose()
+  title: string;
+
+  @ApiProperty({
     example:
       'https://storage.yandexcloud.net/copycube-posts/JpnGGFXf26QBVBCna2cJms93ITycH9jPunTSPzZUE2o',
     description: 'link to content in s3 cloud',

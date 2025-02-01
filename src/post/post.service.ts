@@ -56,6 +56,7 @@ export class PostService {
           created: post.created,
           updated: post.updated,
           key: post.key,
+          title: post.title,
           body: await this.s3Service.getLinkPost(post.body),
           type: post.type,
         };
@@ -99,6 +100,7 @@ export class PostService {
         const response_post: ResponseWithoutProfilePostDto = {
           created: post.created,
           updated: post.updated,
+          title: post.title,
           key: post.key,
           body: await this.s3Service.getLinkPost(post.body),
           type: post.type,
@@ -140,6 +142,7 @@ export class PostService {
           created: post.created,
           updated: post.updated,
           key: post.key,
+          title: post.title,
           body: await this.s3Service.getLinkPost(post.body),
           type: post.type,
           profile: plainToInstance(
@@ -198,6 +201,7 @@ export class PostService {
       created: post.created,
       updated: post.updated,
       key: post.key,
+      title: post.title,
       body: await this.s3Service.getLinkPost(post.body),
       type: post.type,
       profile: plainToInstance(
@@ -230,6 +234,7 @@ export class PostService {
           created: post.created,
           updated: post.updated,
           key: post.key,
+          title: post.title,
           body: await this.s3Service.getLinkPost(post.body),
           type: post.type,
           profile: plainToInstance(
@@ -257,6 +262,7 @@ export class PostService {
           created: post.created,
           updated: post.updated,
           key: post.key,
+          title: post.title,
           body: await this.s3Service.getLinkPost(post.body),
           type: post.type,
           profile: plainToInstance(
