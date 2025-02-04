@@ -241,7 +241,7 @@ export class PostService {
             ProfileResponseDto,
             {
               ...post?.profile,
-              username: post?.profile?.user.username,
+              username: post?.profile?.user?.username,
             },
             {
               excludeExtraneousValues: true,
