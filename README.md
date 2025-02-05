@@ -7,7 +7,7 @@ The project is built on **NestJS** and utilizes **JWT authentication**, **Redis*
 ## Core Technologies
 **NestJS** – Framework for the server-side application.
 **TypeORM** – ORM for database management.  
-**PostgreSQL** – Likely databases (since an ORM is used).
+**PostgreSQL** – databases.
 
 ---
 
